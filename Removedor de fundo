@@ -1,0 +1,40 @@
+#importando biblioteca
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+
+#visualização de imagem
+image_bgr = cv2.imread('/content/drive/MyDrive/Bio System Ltda/04-11-22/Dados coletados/20221113_170703.jpg')
+image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+
+# Mostra a imagem
+plt.imshow(image_rgb)
+plt.show()
+
+#Dimensões da imagem
+image_bgr.shape (1816, 4032, 2)
+
+# Valores do retangulo: começo em x, começo em y, largura, altura
+retangulo = (700, 1000, 300, 4500)
+
+# Cria máscara inicial
+mascara = np.zeros(image_rgb.shape[:2], np.uint8)
+
+#Criação de arrays temporários 
+bgdModel = np.zeros((1, 65), np.float64)
+fgdModel = np.zeros((1, 65), np.float64)
+
+# Roda a função grabCut
+cv2.grabCut(image_rgb, mascara, retangulo, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT) 
+
+#Cria máscara onde o fundo com 0 do contrário coloca 1
+
+mascara_2 = np.where((mascara==2) | (mascara==0), 0, 1).astype('uint8')
+
+#Multiplica a imagem com a nova para subtrair o fundo
+image_rgb_nobg = image_rgb * mascara_2[:, :, np.newaxis]
+
+# Mostra a imagem
+plt.imshow(image_rgb_nobg)
+plt.show()
